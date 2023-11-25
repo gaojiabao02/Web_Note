@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="本文主要是记录一下.net的几种序列化方式。 一、Json序列化 json序列化在webapi项目中是非常流行。因为json非常的直观明了，调用者能够很直观的知道返回的数据信息。现在最受欢迎的json序列化类库应该是Newtonsoft.Json。Newtonsoft是比较优秀的json序列化类库，" />
+    <meta property="og:description" content="本文主要是记录一下.net的几种序列化方式。 一、Json序列化 json序列化在webapi项目中是非常流行。因为json非常的直观明了，调用者能够很直观的知道返回的数据信息。现在最受欢迎的json序列化类库应该是Newtonsoft.Json。Newtonsoft是比较优秀的json序列化类库，" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Json、xml，二进制序列化的简单实现 - john_yong - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="//common.cnblogs.com/favicon.svg" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=vLNTpBOsBpv_vHXQfPQbkLRpws90SOkF__ufoQZSkJM" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/cleargertrude/bundle-cleargertrude.min.css?v=ao_i7cRyAq28rTRfH3XwyaUAOJUI_lVDelGJz66p2QI" />
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/cleargertrude/bundle-cleargertrude-mobile.min.css?v=9OWKvTLfFPzSHulxXWLz7eaV4EsckPK-dWYbiXlIzrM" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/johnyong/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/johnyong/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/johnyong/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 408983;
+        var currentBlogApp = 'johnyong';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'ClearGertrude';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 14957053;
+            window.currentPostDateAdded = '2021-09-14 00:11';
+        </script>
+    <script src="https://common.cnblogs.com/scripts/jquery-2.2.0.min.js"></script>
+    <script src="https://www-cdn.cnblogs.com/js/blog-common.min.js?v=QaHnyClZYP4VsElOZHJ_kbMmgtWteMP1LaeKyvxzUz0"></script>
+    
+
+    
+</head>
+<body class="skin-cleargertrude has-navbar">
+    <a name="top"></a>
+        <div id="bannerbar" class="bannerbar-mobile bannerbar-text-mobile formobile">
+                <a href="https://www.cnblogs.com/cmt/p/17854890.html" onclick="countCreativeClicks('M2-行行AI-公开课')" rel="nofollow">
+                    <img src="https://img2023.cnblogs.com/blog/35695/202311/35695-20231124221906902-108917184.jpg" alt="" onload="countCreativeImpressionsOnMobile('M2-行行AI-公开课')" />
+                    <span id="m2_impression" style="display:none"></span>
+                </a>
+        </div>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//common.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>                              
+                <li>
+                    <a href="https://ing.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-ing')">闪存</a>
+                </li>
+                <li>
+                    <a href="https://edu.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-edu')">班级</a>
+                </li>
+                <li><a href="https://hh.hanghang.com/AIjingpinke" target="_blank">AI培训</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//common.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//common.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//common.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'johnyong', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//common.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//common.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//common.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//common.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//common.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//common.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <div id="header">
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/johnyong/">john_yong</a>
+</h1>
+<p id="tagline"></p>
+
+</div>
+<div id="main">
+	<div id="post_detail">
+	<div class="post">
+		<h2>
+			
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/johnyong/p/14957053.html">
+    <span role="heading" aria-level="2">Json、xml，二进制序列化的简单实现</span>
+    
+
+
+
+</a>
+
+		</h2>
+		<div class="postText"><div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<p>本文主要是记录一下.net的几种序列化方式。</p>
+<h3>一、Json序列化</h3>
+<p>json序列化在webapi项目中是非常流行。因为json非常的直观明了，调用者能够很直观的知道返回的数据信息。现在最受欢迎的json序列化类库应该是Newtonsoft.Json。Newtonsoft是比较优秀的json序列化类库，微软也推荐使用Newtonsoft来实现序列化，而不是使用原先微软自行封装的json序列化类库。当然json序列化还有不少可以特性化的功能，例如指定DateTime类型的序列化格式，指定空值字段不序列化（减少数据传输的大小），指定序列化字段的名称等。</p>
+<p>以下是基于NewtonSoft.Json简单封装的json序列化类</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 128, 128, 1)"> 1</span>     <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> JsonHelper
+</span><span style="color: rgba(0, 128, 128, 1)"> 2</span> <span style="color: rgba(0, 0, 0, 1)">    {
+</span><span style="color: rgba(0, 128, 128, 1)"> 3</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 4</span>         <span style="color: rgba(128, 128, 128, 1)">///</span><span style="color: rgba(0, 128, 0, 1)"> 序列化
+</span><span style="color: rgba(0, 128, 128, 1)"> 5</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;/summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 6</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;typeparam name="T"&gt;&lt;/typeparam&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 7</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;param name="val"&gt;&lt;/param&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 8</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;returns&gt;&lt;/returns&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 9</span>         <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">string</span> Serialize&lt;T&gt;<span style="color: rgba(0, 0, 0, 1)">(T val)
+</span><span style="color: rgba(0, 128, 128, 1)">10</span> <span style="color: rgba(0, 0, 0, 1)">        {
+</span><span style="color: rgba(0, 128, 128, 1)">11</span>             <span style="color: rgba(0, 0, 255, 1)">string</span> result =<span style="color: rgba(0, 0, 0, 1)"> JsonConvert.SerializeObject(val);
+</span><span style="color: rgba(0, 128, 128, 1)">12</span>             <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> result;
+</span><span style="color: rgba(0, 128, 128, 1)">13</span> <span style="color: rgba(0, 0, 0, 1)">        }
+</span><span style="color: rgba(0, 128, 128, 1)">14</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">15</span>         <span style="color: rgba(128, 128, 128, 1)">///</span><span style="color: rgba(0, 128, 0, 1)"> 缩进式序列化
+</span><span style="color: rgba(0, 128, 128, 1)">16</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;/summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">17</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;typeparam name="T"&gt;&lt;/typeparam&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">18</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;param name="val"&gt;&lt;/param&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">19</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;returns&gt;&lt;/returns&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">20</span>         <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">string</span> SerializeIndented&lt;T&gt;<span style="color: rgba(0, 0, 0, 1)">(T val)
+</span><span style="color: rgba(0, 128, 128, 1)">21</span> <span style="color: rgba(0, 0, 0, 1)">        {
+</span><span style="color: rgba(0, 128, 128, 1)">22</span>             <span style="color: rgba(0, 0, 255, 1)">string</span> result =<span style="color: rgba(0, 0, 0, 1)"> JsonConvert.SerializeObject(val, Formatting.Indented);
+</span><span style="color: rgba(0, 128, 128, 1)">23</span>             <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> result;
+</span><span style="color: rgba(0, 128, 128, 1)">24</span> <span style="color: rgba(0, 0, 0, 1)">        }
+</span><span style="color: rgba(0, 128, 128, 1)">25</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">26</span>         <span style="color: rgba(128, 128, 128, 1)">///</span><span style="color: rgba(0, 128, 0, 1)"> 反序列化
+</span><span style="color: rgba(0, 128, 128, 1)">27</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;/summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">28</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;typeparam name="T"&gt;&lt;/typeparam&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">29</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;param name="str"&gt;&lt;/param&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">30</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;returns&gt;&lt;/returns&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">31</span>         <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">static</span> T Deserial&lt;T&gt;(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)"> str)
+</span><span style="color: rgba(0, 128, 128, 1)">32</span> <span style="color: rgba(0, 0, 0, 1)">        {
+</span><span style="color: rgba(0, 128, 128, 1)">33</span>             <span style="color: rgba(0, 0, 255, 1)">var</span> result = JsonConvert.DeserializeObject&lt;T&gt;<span style="color: rgba(0, 0, 0, 1)">(str);
+</span><span style="color: rgba(0, 128, 128, 1)">34</span>             <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> result;
+</span><span style="color: rgba(0, 128, 128, 1)">35</span> <span style="color: rgba(0, 0, 0, 1)">        }
+</span><span style="color: rgba(0, 128, 128, 1)">36</span>     }</pre>
+</div>
+<p>&nbsp;</p>
+<h3>二、xml序列化</h3>
+<p>xml格式虽然比不上json简介明了，但是在蛮多情况下会使用到的。例如有些电商api就指定传输数据为xml格式。还有些配置文件有时也倾向于使用xml格式。</p>
+<p>以下是简单的xml序列化封装</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 128, 128, 1)"> 1</span>     <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> XmlHelper
+</span><span style="color: rgba(0, 128, 128, 1)"> 2</span> <span style="color: rgba(0, 0, 0, 1)">    {
+</span><span style="color: rgba(0, 128, 128, 1)"> 3</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 4</span>         <span style="color: rgba(128, 128, 128, 1)">///</span><span style="color: rgba(0, 128, 0, 1)"> 系列化
+</span><span style="color: rgba(0, 128, 128, 1)"> 5</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;/summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 6</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;typeparam name="T"&gt;&lt;/typeparam&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 7</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;param name="val"&gt;&lt;/param&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 8</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;returns&gt;&lt;/returns&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 9</span>         <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">string</span> Serialize&lt;T&gt;<span style="color: rgba(0, 0, 0, 1)">(T val)
+</span><span style="color: rgba(0, 128, 128, 1)">10</span> <span style="color: rgba(0, 0, 0, 1)">        {
+</span><span style="color: rgba(0, 128, 128, 1)">11</span>             <span style="color: rgba(0, 0, 255, 1)">var</span> serializer = <span style="color: rgba(0, 0, 255, 1)">new</span> XmlSerializer(<span style="color: rgba(0, 0, 255, 1)">typeof</span><span style="color: rgba(0, 0, 0, 1)">(T));
+</span><span style="color: rgba(0, 128, 128, 1)">12</span>             <span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> stringWriter = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> StringWriter(CultureInfo.InvariantCulture))
+</span><span style="color: rgba(0, 128, 128, 1)">13</span> <span style="color: rgba(0, 0, 0, 1)">            {
+</span><span style="color: rgba(0, 128, 128, 1)">14</span> <span style="color: rgba(0, 0, 0, 1)">                serializer.Serialize(stringWriter, val);
+</span><span style="color: rgba(0, 128, 128, 1)">15</span>                 <span style="color: rgba(0, 0, 255, 1)">string</span> xml =<span style="color: rgba(0, 0, 0, 1)"> stringWriter.ToString();
+</span><span style="color: rgba(0, 128, 128, 1)">16</span>                 <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> xml;
+</span><span style="color: rgba(0, 128, 128, 1)">17</span> <span style="color: rgba(0, 0, 0, 1)">            }
+</span><span style="color: rgba(0, 128, 128, 1)">18</span> <span style="color: rgba(0, 0, 0, 1)">        }
+</span><span style="color: rgba(0, 128, 128, 1)">19</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">20</span>         <span style="color: rgba(128, 128, 128, 1)">///</span><span style="color: rgba(0, 128, 0, 1)"> 反序列化
+</span><span style="color: rgba(0, 128, 128, 1)">21</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;/summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">22</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;typeparam name="T"&gt;&lt;/typeparam&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">23</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;param name="xmlString"&gt;&lt;/param&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">24</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;returns&gt;&lt;/returns&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">25</span>         <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">static</span> T Deserialize&lt;T&gt;(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)"> xmlString)
+</span><span style="color: rgba(0, 128, 128, 1)">26</span> <span style="color: rgba(0, 0, 0, 1)">        {
+</span><span style="color: rgba(0, 128, 128, 1)">27</span>             <span style="color: rgba(0, 0, 255, 1)">var</span> serializer = <span style="color: rgba(0, 0, 255, 1)">new</span> XmlSerializer(<span style="color: rgba(0, 0, 255, 1)">typeof</span><span style="color: rgba(0, 0, 0, 1)">(T));
+</span><span style="color: rgba(0, 128, 128, 1)">28</span>             <span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> reader = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> StringReader(xmlString))
+</span><span style="color: rgba(0, 128, 128, 1)">29</span> <span style="color: rgba(0, 0, 0, 1)">            {
+</span><span style="color: rgba(0, 128, 128, 1)">30</span>                 <span style="color: rgba(0, 0, 255, 1)">var</span> result =<span style="color: rgba(0, 0, 0, 1)"> (T)serializer.Deserialize(reader);
+</span><span style="color: rgba(0, 128, 128, 1)">31</span>                 <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> result;
+</span><span style="color: rgba(0, 128, 128, 1)">32</span> <span style="color: rgba(0, 0, 0, 1)">            }
+</span><span style="color: rgba(0, 128, 128, 1)">33</span> <span style="color: rgba(0, 0, 0, 1)">        }
+</span><span style="color: rgba(0, 128, 128, 1)">34</span>          
+<span style="color: rgba(0, 128, 128, 1)">35</span>     }</pre>
+</div>
+<p>&nbsp;</p>
+<h3>三、二进制序列化</h3>
+<p>二进制序列化一般情况下数据大小会比xml，json的序列化的更小。但是二进制则不能直观的知道数据的内容信息。</p>
+<p>二进制序列化实现</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 128, 128, 1)"> 1</span>     <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> BinaryHelper
+</span><span style="color: rgba(0, 128, 128, 1)"> 2</span> <span style="color: rgba(0, 0, 0, 1)">    {
+</span><span style="color: rgba(0, 128, 128, 1)"> 3</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 4</span>         <span style="color: rgba(128, 128, 128, 1)">///</span><span style="color: rgba(0, 128, 0, 1)"> 序列化
+</span><span style="color: rgba(0, 128, 128, 1)"> 5</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;/summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 6</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;typeparam name="T"&gt;&lt;/typeparam&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 7</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;param name="val"&gt;&lt;/param&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 8</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;returns&gt;&lt;/returns&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)"> 9</span>         <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">byte</span>[] Serialize&lt;T&gt;<span style="color: rgba(0, 0, 0, 1)">(T val)
+</span><span style="color: rgba(0, 128, 128, 1)">10</span> <span style="color: rgba(0, 0, 0, 1)">        {
+</span><span style="color: rgba(0, 128, 128, 1)">11</span>             <span style="color: rgba(0, 0, 255, 1)">if</span> (val == <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">)
+</span><span style="color: rgba(0, 128, 128, 1)">12</span> <span style="color: rgba(0, 0, 0, 1)">            {
+</span><span style="color: rgba(0, 128, 128, 1)">13</span>                 <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">;
+</span><span style="color: rgba(0, 128, 128, 1)">14</span> <span style="color: rgba(0, 0, 0, 1)">            }
+</span><span style="color: rgba(0, 128, 128, 1)">15</span>             <span style="color: rgba(0, 0, 255, 1)">var</span> binaryFormatter = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> BinaryFormatter();
+</span><span style="color: rgba(0, 128, 128, 1)">16</span>             <span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> stream = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> MemoryStream())
+</span><span style="color: rgba(0, 128, 128, 1)">17</span> <span style="color: rgba(0, 0, 0, 1)">            {
+</span><span style="color: rgba(0, 128, 128, 1)">18</span> <span style="color: rgba(0, 0, 0, 1)">                binaryFormatter.Serialize(stream, val);
+</span><span style="color: rgba(0, 128, 128, 1)">19</span>                 <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> stream.ToArray();
+</span><span style="color: rgba(0, 128, 128, 1)">20</span> 
+<span style="color: rgba(0, 128, 128, 1)">21</span> <span style="color: rgba(0, 0, 0, 1)">            }
+</span><span style="color: rgba(0, 128, 128, 1)">22</span> <span style="color: rgba(0, 0, 0, 1)">        }
+</span><span style="color: rgba(0, 128, 128, 1)">23</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">24</span>         <span style="color: rgba(128, 128, 128, 1)">///</span><span style="color: rgba(0, 128, 0, 1)"> 反序列化
+</span><span style="color: rgba(0, 128, 128, 1)">25</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;/summary&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">26</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;typeparam name="T"&gt;&lt;/typeparam&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">27</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;param name="data"&gt;&lt;/param&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">28</span>         <span style="color: rgba(128, 128, 128, 1)">///</span> <span style="color: rgba(128, 128, 128, 1)">&lt;returns&gt;&lt;/returns&gt;</span>
+<span style="color: rgba(0, 128, 128, 1)">29</span>         <span style="color: rgba(0, 0, 255, 1)">public</span> <span style="color: rgba(0, 0, 255, 1)">static</span> T Deserialize&lt;T&gt;(<span style="color: rgba(0, 0, 255, 1)">byte</span><span style="color: rgba(0, 0, 0, 1)">[] data)
+</span><span style="color: rgba(0, 128, 128, 1)">30</span> <span style="color: rgba(0, 0, 0, 1)">        {
+</span><span style="color: rgba(0, 128, 128, 1)">31</span>             <span style="color: rgba(0, 0, 255, 1)">if</span> (data == <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">)
+</span><span style="color: rgba(0, 128, 128, 1)">32</span> <span style="color: rgba(0, 0, 0, 1)">            {
+</span><span style="color: rgba(0, 128, 128, 1)">33</span>                 <span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(0, 0, 255, 1)">default</span><span style="color: rgba(0, 0, 0, 1)">(T);
+</span><span style="color: rgba(0, 128, 128, 1)">34</span> <span style="color: rgba(0, 0, 0, 1)">            }
+</span><span style="color: rgba(0, 128, 128, 1)">35</span>             <span style="color: rgba(0, 0, 255, 1)">var</span> binaryFormat = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> BinaryFormatter();
+</span><span style="color: rgba(0, 128, 128, 1)">36</span>             <span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> stream = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> MemoryStream(data))
+</span><span style="color: rgba(0, 128, 128, 1)">37</span> <span style="color: rgba(0, 0, 0, 1)">            {
+</span><span style="color: rgba(0, 128, 128, 1)">38</span>                 <span style="color: rgba(0, 0, 255, 1)">var</span> result =<span style="color: rgba(0, 0, 0, 1)"> (T)binaryFormat.Deserialize(stream);
+</span><span style="color: rgba(0, 128, 128, 1)">39</span>                 <span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> result;
+</span><span style="color: rgba(0, 128, 128, 1)">40</span> <span style="color: rgba(0, 0, 0, 1)">            }
+</span><span style="color: rgba(0, 128, 128, 1)">41</span> <span style="color: rgba(0, 0, 0, 1)">        }
+</span><span style="color: rgba(0, 128, 128, 1)">42</span>     }</pre>
+</div>
+<p>&nbsp;</p>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div></div>
+		<p class="postfoot">
+			posted on 
+<span id="post-date" data-last-update-days="717.7593856254618" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2021-12-07 21:44">2021-09-14 00:11</span>&nbsp;
+<a href="https://www.cnblogs.com/johnyong/">john_yong</a>&nbsp;
+阅读(<span id="post_view_count">361</span>)&nbsp;
+评论(<span id="post_comment_count">0</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=14957053" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(14957053);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '14957053', targetLink: 'https://www.cnblogs.com/johnyong/p/14957053.html', title: 'Json、xml，二进制序列化的简单实现' })">举报</a>
+
+		</p>
+	</div>
+	
+	
+	
+<script>
+    var cb_entryId = 14957053, cb_entryCreatedDate = '2021-09-14 00:11', cb_postType = 1, cb_postTitle = 'Json、xml，二进制序列化的简单实现';
+    var allowComments = true, cb_blogId = 408983, cb_blogApp = 'johnyong', cb_blogUserGuid = '645757e4-f163-4cdc-3c7f-08d54dba4453';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left" href="https://www.cnblogs.com/cmt/p/17520031.html" target="_blank">会员救园</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card">
+            <div id='div-gpt-ad-1592365906576-0' style='width: 300px; height: 250px;'></div>
+    </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+</div>
+
+
+</div>
+<div id="rightmenu">
+	
+		
+<h3>导航</h3>
+<ul>
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/johnyong/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/john_yong">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/johnyong/rss/">
+订阅</a>
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/johnyong/rss/">
+    <img src="/skins/cleargertrude/images/xml.gif" alt="订阅" />
+</a></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div id="sidebar_news" class="newsItem">
+    <h3>公告</h3>
+<div class="newsItem">
+	<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+</div>
+
+ 
+</div>
+<div id="sidebar_c3"></div>					
+		<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>
+		<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+		<div id="footer">
+	Powered by: 
+	<br />
+	<a href="https://www.cnblogs.com/" id="footer_site_link">博客园</a>
+	<br />
+	Copyright &copy; 2023 john_yong
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+</div>
+
+
+	
+</div>			
+			
+	
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8Eg9kra6YURKsOjJwROiT4tNsg7OCpNN-4XTQ6Bx55VrVTYL4BkKEuWHLXaB_eUK0tjwp3ywYiZEKkdKKPeX4OPvTyHjIzNEMdXHE8e4plV4hPs8MbOtJDuDM8er0JpcMS8QCV9DFf_VxX2UB-dboY0" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>
